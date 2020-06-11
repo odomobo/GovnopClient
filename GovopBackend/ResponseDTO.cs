@@ -10,6 +10,7 @@ namespace GovopBackend
         public const int Message = 0;
         public const int AddUpdateName = 1;
         public const int RemoveName = 2;
+        public const int Roll = 3;
     }
     public class ResponseDTO
     {

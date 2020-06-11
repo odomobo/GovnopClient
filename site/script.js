@@ -5,7 +5,15 @@ var Nickname = "";
 
 $(document).ready(function(){
   setURL();
-  USER_GUID = uuidv4(); // TODO: use session storage
+  setInitialNickname();
+  setInitialUserId();
+  $("#nickname").change(nicknameChanged);
+  $("#roll-btn").click(rollClicked);
+  $("#message").on('keypress',function(e) {
+    if(e.which == 13) {
+      messageEntered();
+    }
+  });
   startPolling();
 });
 
@@ -15,15 +23,28 @@ function setURL()
   // TODO: give error message on bad URL?
   console.log(urlVars);
   URL = urlVars["url"];
-  setInitialNickname()
-  $("#nickname").change(nicknameChanged);
+}
+
+function setInitialUserId()
+{
+  USER_GUID = localStorage.getItem("USER_GUID");
+  
+  if (!USER_GUID)
+  {
+    USER_GUID = uuidv4(); // TODO: use session storage
+    localStorage.setItem("USER_GUID", USER_GUID);
+  }
 }
 
 function setInitialNickname()
 {
-  var initialNickname = "unnamed user";
-  $("#nickname").val(initialNickname);
-  Nickname = initialNickname;
+  Nickname = localStorage.getItem("Nickname");
+  if (!Nickname)
+  {
+    Nickname = "unnamed_user";
+    localStorage.setItem("Nickname", Nickname);
+  }
+  $("#nickname").val(Nickname);
 }
 
 function createMessage(type, message)
@@ -35,8 +56,7 @@ function nicknameChanged()
 {
   var nickname = $("#nickname").val();
   Nickname = nickname;
-  ping();
-  //sendMessage(createMessage(0, "Nickname changed from xxx to " + nickname));
+  localStorage.setItem("Nickname", Nickname);
 }
 
 function uuidv4() {
@@ -44,6 +64,13 @@ function uuidv4() {
     var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
     return v.toString(16);
   });
+}
+
+function messageEntered()
+{
+  var message = $("#message").val();
+  $("#message").val("");
+  sendMessage({userGuid: USER_GUID, nickname: Nickname, type: TYPE_MESSAGE, message: message});
 }
 
 function sendMessage(message)
@@ -55,6 +82,20 @@ function sendMessage(message)
       async: true,
       timeout: 10000,
       data: JSON.stringify(message),
+      contentType: "application/json"
+    }
+  );
+}
+
+function rollClicked()
+{
+  console.log("Roll clicked");
+  $.ajax(URL + "/roll",
+    {
+      method: "POST",
+      async: true,
+      timeout: 10000,
+      data: JSON.stringify({userGuid: USER_GUID, nickname: Nickname}),
       contentType: "application/json"
     }
   );
@@ -73,13 +114,6 @@ function getUrlVars()
         vars[hash[0]] = hash[1];
     }
     return vars;
-}
-
-var LatestId;
-function startPolling()
-{
-  LatestId = 0;
-  setTimeout(poll, 0);
 }
 
 function appendRawMessage(text)
@@ -112,17 +146,36 @@ function appendSystemMessage(message)
 
 function addUpdateUser(guid, nickname)
 {
-  appendSystemMessage("Nickname added or updated to " + nickname);
+  var $user = $("#players li[data-guid='" + guid + "']");
+  if ($user.length == 0)
+  {
+    appendSystemMessage(nickname + " logged on");
+    $("#players").append("<li data-guid='" + guid + "'>" + nickname + "</li>");
+  }
+  else
+  {
+    var oldNickname = $user.text();
+    appendSystemMessage(oldNickname + " updated their nickname to " + nickname);
+    $user.text(nickname);
+  }
 }
 
 function removeUser(guid, nickname)
 {
+  var $user = $("#players li[data-guid='" + guid + "']");
+  $user.remove();
   appendSystemMessage(nickname + " logged off");
+}
+
+function rollReceived(guid, nickname, message)
+{
+  appendSystemMessage(nickname + " rolled " + message);
 }
 
 var TYPE_MESSAGE=0;
 var TYPE_ADD_UPDATE_USER=1;
 var TYPE_REMOVE_USER=2;
+var TYPE_ROLL=3;
 
 function processResponse(response)
 {
@@ -138,11 +191,20 @@ function processResponse(response)
   {
     removeUser(response.userGuid, response.nickname);
   }
+  else if (response.type == TYPE_ROLL)
+  {
+    rollReceived(response.userGuid, response.nickname, response.message);
+  }
   else
   {
     console.log("Invalid response object:");
     console.log(response);
   }
+}
+
+function startPinging()
+{
+  setTimeout(ping, 0);
 }
 
 function ping()
@@ -151,11 +213,24 @@ function ping()
     {
       method: "POST",
       async: true,
-      timeout: 1000,
+      timeout: 5000,
       data: JSON.stringify({userGuid: USER_GUID, nickname: Nickname}),
       contentType: "application/json"
     }
-  );
+  ).done(function(){
+    $("#connection-error").addClass("hidden");
+  }).fail(function(){
+    $("#connection-error").removeClass("hidden");
+  }).always(function(){
+    setTimeout(ping, 1000);
+  });
+}
+
+var LatestId;
+function startPolling()
+{
+  LatestId = 0;
+  setTimeout(poll, 0);
 }
 
 function poll()

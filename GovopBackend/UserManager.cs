@@ -54,15 +54,22 @@ namespace GovopBackend
         {
             while (true)
             {
-                Thread.Sleep(TimeSpan.FromSeconds(30));
+                Thread.Sleep(TimeSpan.FromSeconds(5));
                 lock (_users)
                 {
+                    List<Guid> guidsToRemove = new List<Guid>();
                     foreach (var kvp in _users)
                     {
-                        if (DateTime.Now - kvp.Value.LastSeen > TimeSpan.FromSeconds(60))
+                        if (DateTime.Now - kvp.Value.LastSeen > TimeSpan.FromSeconds(10))
                         {
                             ActionEventQueue.Instance.Value.Add(new ResponseDTO {UserGuid = kvp.Key, Nickname = kvp.Value.Nickname, Type = Types.RemoveName});
+                            guidsToRemove.Add(kvp.Key);
                         }
+                    }
+
+                    foreach (var guid in guidsToRemove)
+                    {
+                        _users.Remove(guid);
                     }
                 }
             }

@@ -1,0 +1,21 @@
+<html>
+  <head>
+    <title>Govnopoly</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="script.js"></script>
+    <style type="text/css">
+      .hidden { display: none; }
+    </style>
+  </head>
+  <body>
+    <h1 id="connection-error" class="hidden">Connection error to server...</h1>
+    <h1>Govnopoly</h1>
+    <label>Nickname: </label><input type="text" id="nickname"></input>
+    <ul id="players"></ul>
+    <textarea readonly id="messages" rows="50" cols="80"></textarea>
+    <br/>
+    <input type="text" id="message" placeholder="Message"></input>
+    <br/>
+    <button id="roll-btn">Roll</button>
+  </body>
+</html>
