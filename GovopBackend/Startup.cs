@@ -53,7 +53,7 @@ namespace GovopBackend.DTOs
 
             app.UseCors(MyAllowSpecificOrigins);
 
-            app.UseAuthorization();
+            //app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {

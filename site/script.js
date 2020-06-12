@@ -392,7 +392,6 @@ function startPolling()
 
 function poll()
 {
-  ping();
   console.log("Waiting for " + LatestId);
   $.ajax(URL + "/actions/" + LatestId,
     {
