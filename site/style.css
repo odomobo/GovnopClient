@@ -20,3 +20,7 @@
 #players .voted .nickname {
   color: green;
 }
+
+.vote-selected {
+  color: green;
+}

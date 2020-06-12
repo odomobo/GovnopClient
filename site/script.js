@@ -98,6 +98,21 @@ function sendVote(voteId)
       contentType: "application/json"
     }
   );
+  
+  $("#vote-pane button").removeClass("vote-selected");
+  
+  if (voteId == VOTE_ABSTAIN)
+  {
+    $("#vote-abstain-btn").addClass("vote-selected");
+  }
+  else if (voteId == VOTE_YES)
+  {
+    $("#vote-yes-btn").addClass("vote-selected");
+  }
+  else if (voteId == VOTE_NO)
+  {
+    $("#vote-no-btn").addClass("vote-selected");
+  }
 }
 
 function sendStartVote()
@@ -272,19 +287,19 @@ function openVoting(userGuid, nickname)
 {
   $("#start-vote-pane").addClass("disabled")
   $("#vote-pane").removeClass("disabled")
+  $("#vote-pane button").removeClass("vote-selected");
   
   appendSystemMessage(nickname + " initiated a vote");
   
   $("#players").removeClass("show-votes");
   $("#players .vote").text("");
-  
-  // TODO
 }
 
 function closeVoting(userGuid, nickname, message)
 {
   $("#start-vote-pane").removeClass("disabled")
   $("#vote-pane").addClass("disabled")
+  $("#vote-pane button").removeClass("vote-selected");
   
   if (userGuid == SYSTEM_GUID)
   {
@@ -297,8 +312,6 @@ function closeVoting(userGuid, nickname, message)
   
   $("#players").addClass("show-votes");
   $("#players li").removeClass("voted");
-  
-  // TODO
 }
 
 const TYPE_MESSAGE=0;
