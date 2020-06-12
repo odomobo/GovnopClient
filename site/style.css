@@ -1,0 +1,22 @@
+.hidden { display: none; }
+
+.disabled button {
+  pointer-events: none;
+  color: gray;
+}
+
+.disabled {
+  background-color: gray;
+}
+
+#players .vote {
+  display: none;
+}
+
+#players.show-votes .vote {
+  display: inline;
+}
+
+#players .voted .nickname {
+  color: green;
+}

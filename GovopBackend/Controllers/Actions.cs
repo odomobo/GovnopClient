@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
-namespace GovopBackend.Controllers
+namespace GovopBackend.DTOs.Controllers
 {
     [ApiController]
     [Route("[controller]")]

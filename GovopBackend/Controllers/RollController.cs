@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 
-namespace GovopBackend.Controllers
+namespace GovopBackend.DTOs.Controllers
 {
     [ApiController]
     [Route("[controller]")]
@@ -13,7 +13,7 @@ namespace GovopBackend.Controllers
         private readonly Random _random = new Random();
 
         [HttpPost]
-        public void Post(PingDto ping)
+        public void Post(PingDTO ping)
         {
             var roll = Roll(2, 6);
             var rollStr = string.Join(" ", roll);

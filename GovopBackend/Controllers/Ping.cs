@@ -4,16 +4,14 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 
-namespace GovopBackend.Controllers
+namespace GovopBackend.DTOs.Controllers
 {
     [ApiController]
     [Route("[controller]")]
     public class PingController : ControllerBase
     {
-        private static Dictionary<Guid, string> Users = new Dictionary<Guid, string>();
-
         [HttpPost]
-        public void Post(PingDto ping)
+        public void Post(PingDTO ping)
         {
             UserManager.Instance.Value.Ping(ping.UserGuid, ping.Nickname);
         }

@@ -2,6 +2,7 @@
 var URL="";
 var USER_GUID="";
 var Nickname = "";
+const SYSTEM_GUID = "00000000-0000-0000-0000-000000000000";
 
 $(document).ready(function(){
   setURL();
@@ -14,6 +15,7 @@ $(document).ready(function(){
       messageEntered();
     }
   });
+  initVoting();
   startPolling();
 });
 
@@ -22,17 +24,17 @@ function setURL()
   var urlVars = getUrlVars();
   // TODO: give error message on bad URL?
   console.log(urlVars);
-  URL = urlVars["url"];
+  URL = urlVars["server"];
 }
 
 function setInitialUserId()
 {
-  USER_GUID = localStorage.getItem("USER_GUID");
+  USER_GUID = sessionStorage.getItem("USER_GUID");
   
   if (!USER_GUID)
   {
     USER_GUID = uuidv4(); // TODO: use session storage
-    localStorage.setItem("USER_GUID", USER_GUID);
+    sessionStorage.setItem("USER_GUID", USER_GUID);
   }
 }
 
@@ -64,6 +66,66 @@ function uuidv4() {
     var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
     return v.toString(16);
   });
+}
+
+const VOTE_ABSTAIN=0;
+const VOTE_YES=1;
+const VOTE_NO=2;
+
+function initVoting() {
+  $("#start-vote-btn").click(sendStartVote);
+  $("#clear-vote-btn").click(clearVote);
+  $("#vote-yes-btn").click(function(){sendVote(VOTE_YES)});
+  $("#vote-no-btn").click(function(){sendVote(VOTE_NO)});
+  $("#vote-abstain-btn").click(function(){sendVote(VOTE_ABSTAIN)});
+  $("#close-vote-btn").click(sendCloseVote);
+}
+
+function clearVote() {
+  $("#players").removeClass("show-votes");
+  // TODO
+}
+
+function sendVote(voteId)
+{
+  console.log("Sending voting button click for: " + voteId);
+  $.ajax(URL + "/vote",
+    {
+      method: "POST",
+      async: true,
+      timeout: 10000,
+      data: JSON.stringify({userGuid: USER_GUID, nickname: Nickname, voteId: voteId}),
+      contentType: "application/json"
+    }
+  );
+}
+
+function sendStartVote()
+{
+  console.log("Sending open vote");
+  $.ajax(URL + "/vote/open",
+    {
+      method: "POST",
+      async: true,
+      timeout: 10000,
+      data: JSON.stringify({userGuid: USER_GUID, nickname: Nickname}),
+      contentType: "application/json"
+    }
+  );
+}
+
+function sendCloseVote()
+{
+  console.log("Sending close vote");
+  $.ajax(URL + "/vote/close",
+    {
+      method: "POST",
+      async: true,
+      timeout: 10000,
+      data: JSON.stringify({userGuid: USER_GUID, nickname: Nickname}),
+      contentType: "application/json"
+    }
+  );
 }
 
 function messageEntered()
@@ -150,13 +212,16 @@ function addUpdateUser(guid, nickname)
   if ($user.length == 0)
   {
     appendSystemMessage(nickname + " logged on");
-    $("#players").append("<li data-guid='" + guid + "'>" + nickname + "</li>");
+    $user = $("<li data-guid='" + guid + "'><span class='nickname'></span> <span class='vote'></span></li>");
+    $user.find(".nickname").text(nickname);
+    $("#players").append($user);
   }
   else
   {
-    var oldNickname = $user.text();
+    var $userNickname = $user.find(".nickname");
+    var oldNickname = $userNickname.text();
     appendSystemMessage(oldNickname + " updated their nickname to " + nickname);
-    $user.text(nickname);
+    $userNickname.text(nickname);
   }
 }
 
@@ -172,10 +237,77 @@ function rollReceived(guid, nickname, message)
   appendSystemMessage(nickname + " rolled " + message);
 }
 
-var TYPE_MESSAGE=0;
-var TYPE_ADD_UPDATE_USER=1;
-var TYPE_REMOVE_USER=2;
-var TYPE_ROLL=3;
+function voteReceived(userGuid, nickname, vote)
+{
+  console.log("Vote received: " + vote);
+  var $user = $("#players li[data-guid='" + userGuid + "']");
+  $user.addClass("voted");
+  
+  var text;
+  if (vote == VOTE_ABSTAIN)
+  {
+    text = TEXT_ABSTAIN;
+  } 
+  else if (vote == VOTE_YES)
+  {
+    text = TEXT_YES;
+  }
+  else if (vote == VOTE_NO)
+  {
+    text = TEXT_NO;
+  }
+  else
+  {
+    console.log("Error: invalid vote: " + vote);
+  }
+  
+  $user.find(".vote").text(text);
+}
+
+const TEXT_ABSTAIN = "- Abstain";
+const TEXT_YES = "- Yes";
+const TEXT_NO = "- No";
+
+function openVoting(userGuid, nickname)
+{
+  $("#start-vote-pane").addClass("disabled")
+  $("#vote-pane").removeClass("disabled")
+  
+  appendSystemMessage(nickname + " initiated a vote");
+  
+  $("#players").removeClass("show-votes");
+  $("#players .vote").text("");
+  
+  // TODO
+}
+
+function closeVoting(userGuid, nickname, message)
+{
+  $("#start-vote-pane").removeClass("disabled")
+  $("#vote-pane").addClass("disabled")
+  
+  if (userGuid == SYSTEM_GUID)
+  {
+    appendSystemMessage("voting closed automatically; " + message);
+  }
+  else
+  {
+    appendSystemMessage(nickname + " closed voting; " + message);
+  }
+  
+  $("#players").addClass("show-votes");
+  $("#players li").removeClass("voted");
+  
+  // TODO
+}
+
+const TYPE_MESSAGE=0;
+const TYPE_ADD_UPDATE_USER=1;
+const TYPE_REMOVE_USER=2;
+const TYPE_ROLL=3;
+const TYPE_VOTE=4;
+const TYPE_VOTING_OPENED=5;
+const TYPE_VOTING_CLOSED=6;
 
 function processResponse(response)
 {
@@ -194,6 +326,18 @@ function processResponse(response)
   else if (response.type == TYPE_ROLL)
   {
     rollReceived(response.userGuid, response.nickname, response.message);
+  }
+  else if (response.type == TYPE_VOTE)
+  {
+    voteReceived(response.userGuid, response.nickname, response.voteType)
+  }
+  else if (response.type == TYPE_VOTING_OPENED)
+  {
+    openVoting(response.userGuid, response.nickname);
+  }
+  else if (response.type == TYPE_VOTING_CLOSED)
+  {
+    closeVoting(response.userGuid, response.nickname, response.message);
   }
   else
   {
