@@ -211,7 +211,7 @@ function addUpdateUser(guid, nickname)
   var $user = $("#players li[data-guid='" + guid + "']");
   if ($user.length == 0)
   {
-    appendSystemMessage(nickname + " logged on");
+    appendSystemMessage(nickname + " connected");
     $user = $("<li data-guid='" + guid + "'><span class='nickname'></span> <span class='vote'></span></li>");
     $user.find(".nickname").text(nickname);
     $("#players").append($user);
@@ -229,7 +229,7 @@ function removeUser(guid, nickname)
 {
   var $user = $("#players li[data-guid='" + guid + "']");
   $user.remove();
-  appendSystemMessage(nickname + " logged off");
+  appendSystemMessage(nickname + " disconnected");
 }
 
 function rollReceived(guid, nickname, message)
