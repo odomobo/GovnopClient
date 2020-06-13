@@ -16,6 +16,7 @@ $(document).ready(function(){
     }
   });
   initVoting();
+  startPinging();
   startPolling();
 });
 
@@ -193,32 +194,27 @@ function getUrlVars()
     return vars;
 }
 
-function appendRawMessage(text)
+function appendRawMessage(html)
 {
-  var messageBox = $("#messages");
-  var prevMessage = messageBox.val();
-  if (prevMessage.length == 0)
-  {
-    messageBox.val(text);
-  }
-  else
-  {
-    messageBox.val(prevMessage + "\n" + text);
-  }
-  
-  messageBox.scrollTop(messageBox[0].scrollHeight);
+  var $messageList = $("#messages");
+  //$newMessage = $("<li class='"+cls+"'>"+html+"</li>");
+  $messageList.append(html);
 }
 
 function appendMessage(nickname, message)
 {
-  var text = nickname + ": " + message;
-  appendRawMessage(text);
+  // TODO: don't preserve nickname, but do preserve message
+  var $html = $("<li class='player'><span class='username'></span> <span class='message'></span></li>");
+  $html.find(".username").text(nickname+":");
+  $html.find(".message").text(message);
+  appendRawMessage($html[0].outerHTML);
 }
 
 function appendSystemMessage(message)
 {
-  var text = "* " + message;
-  appendRawMessage(text);
+  var $html = $("<li class='system'></li>");
+  $html.text("* " + message);
+  appendRawMessage($html[0].outerHTML);
 }
 
 function addUpdateUser(guid, nickname)

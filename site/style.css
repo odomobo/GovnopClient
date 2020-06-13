@@ -24,3 +24,7 @@
 .vote-selected {
   color: green;
 }
+
+#messages {
+  list-style-type: none;
+}

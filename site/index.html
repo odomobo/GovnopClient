@@ -8,12 +8,14 @@
   <body>
     <h1 id="connection-error" class="hidden">Connection error to server...</h1>
     <h1>Govnopoly</h1>
-    <label>Nickname: </label><input type="text" id="nickname"></input>
-    <ul id="players"></ul>
-    <textarea readonly id="messages" rows="50" cols="80"></textarea>
-    <br/>
-    <input type="text" id="message" placeholder="Message"></input>
-    <br/>
+    <div id="players-pane">
+      <label>Nickname: </label><input type="text" id="nickname"></input>
+      <ul id="players"></ul>
+    </div>
+    <div id="message-pane">
+      <ul id="messages"></ul>
+      <input type="text" id="message" placeholder="Message"></input>
+    </div>
     <button id="roll-btn">Roll</button>
     <div id="start-vote-pane">
       <button id="start-vote-btn">Start Vote</button>
@@ -23,7 +25,6 @@
       <button id="vote-yes-btn">Yes</button>
       <button id="vote-no-btn">No</button>
       <button id="vote-abstain-btn">Abstain</button>
-      <br/>
       <button id="close-vote-btn">Close Vote</button>
     </div>
   </body>
