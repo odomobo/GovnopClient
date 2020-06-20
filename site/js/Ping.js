@@ -17,9 +17,9 @@ function ping()
       contentType: "application/json"
     }
   ).done(function(){
-    $("#connection-error").addClass("hidden");
+    ViewModel.connectionError = false;
   }).fail(function(){
-    $("#connection-error").removeClass("hidden");
+    ViewModel.connectionError = true;
   }).always(function(){
     setTimeout(ping, 1000);
   });

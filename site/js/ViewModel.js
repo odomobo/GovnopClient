@@ -6,13 +6,11 @@ import * as Voting from './Voting.js';
 
 var App = new Vue({
   el: '#app',
-  // TODO: encapsulate all of the data possible
   data: {
     players: {},
     nickname: "",
     userGuid: "",
     messages: [],
-    // TODO: encapsulate this inside of voting component
     voting: {      
       buttons: [
         {text: "Yes", voteId: 'y', selected: false},
@@ -21,7 +19,8 @@ var App = new Vue({
       ],
       selected: "",
       isOpen: false
-    }
+    },
+    connectionError: false
   },
   components: {
     "player": Players.PlayerComponent,

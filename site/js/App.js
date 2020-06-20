@@ -15,7 +15,6 @@ $(document).ready(function(){
       messageEntered();
     }
   });
-  initVoting();
   Ping.start();
   Polling.start();
 });
@@ -54,43 +53,6 @@ function uuidv4() {
     var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
     return v.toString(16);
   });
-}
-
-const VOTE_ABSTAIN='a';
-const VOTE_YES='y';
-const VOTE_NO='n';
-
-function initVoting() {
-  $("#start-vote-btn").click(sendStartVote);
-  $("#close-vote-btn").click(sendCloseVote);
-}
-
-function sendStartVote()
-{
-  console.log("Sending open vote");
-  $.ajax(URL + "/vote/open",
-    {
-      method: "POST",
-      async: true,
-      timeout: 10000,
-      data: JSON.stringify({userGuid: ViewModel.userGuid, nickname: ViewModel.nickname}),
-      contentType: "application/json"
-    }
-  );
-}
-
-function sendCloseVote()
-{
-  console.log("Sending close vote");
-  $.ajax(URL + "/vote/close",
-    {
-      method: "POST",
-      async: true,
-      timeout: 10000,
-      data: JSON.stringify({userGuid: ViewModel.userGuid, nickname: ViewModel.nickname}),
-      contentType: "application/json"
-    }
-  );
 }
 
 function rollClicked()

@@ -33,6 +33,7 @@ export function addUpdate(guid, nickname)
 
 export function remove(guid, nickname)
 {
+  // can't directly delete property, because vue won't see it
   ViewModel.$delete(ViewModel.players, guid);
   Messages.display(null, nickname + " disconnected");
 }

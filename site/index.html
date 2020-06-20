@@ -27,14 +27,12 @@
   </head>
   <body>
     <div id="app">
-      <h1 id="connection-error" class="hidden">Connection error to server...</h1>
+      <h1 id="connection-error" v-bind:class="{ hidden: !connectionError}">Connection error to server...</h1>
       <h1>Govnopoly</h1>
       
       <div id="players-pane">
         <label>Nickname: </label><input type="text" id="nickname"></input>        
         <ul id="players" v-bind:class="{ 'show-votes': !voting.isOpen }">
-          <!-- TODO: remove key maybe??? -->
-          <!-- TODO: combine props into a single object?? -->
           <player 
             v-for="(player, guid) in players"
             v-bind:key="guid"

@@ -4,7 +4,7 @@ import * as Messages from './Messages.js';
 
 
 
-var VotingButtonComponent = {
+const VotingButtonComponent = {
   template: `
     <button 
       :id="'vote-' + voteBtn.voteId + '-btn'" 
@@ -17,19 +17,21 @@ var VotingButtonComponent = {
     selectedVote: String
   },
   methods: {
+    
     selectVote: function(voteId) {
       sendVote(voteId);
       ViewModel.voting.selected = voteId;
     }
+    
   }
 };
 
-export var VotingComponent = {
+export const VotingComponent = {
   template: `
     <div id="voting-pane">
       <div id="start-vote-pane">
-        <button id="start-vote-btn" v-bind:class="{ disabled: votingOpen }">Start Vote</button>
-        <button id="close-vote-btn" v-bind:class="{ disabled: !votingOpen }">Close Vote</button>
+        <button id="start-vote-btn" v-bind:class="{ disabled: votingOpen }" v-on:click="start">Start Vote</button>
+        <button id="close-vote-btn" v-bind:class="{ disabled: !votingOpen }" v-on:click="close">Close Vote</button>
       </div>
       <div id="vote-pane" v-bind:class="{ disabled: !votingOpen }">
         <voting-button 
@@ -47,6 +49,10 @@ export var VotingComponent = {
   },
   components: {
     "votingButton": VotingButtonComponent
+  },
+  methods: {
+    start: function() {sendStartVote()},
+    close: function() {sendCloseVote()},
   }
 }
 
@@ -59,6 +65,34 @@ function sendVote(voteId)
       async: true,
       timeout: 10000,
       data: JSON.stringify({userGuid: ViewModel.userGuid, nickname: ViewModel.nickname, voteId: voteId}),
+      contentType: "application/json"
+    }
+  );
+}
+
+function sendStartVote()
+{
+  console.log("Sending open vote");
+  $.ajax(URL + "/vote/open",
+    {
+      method: "POST",
+      async: true,
+      timeout: 10000,
+      data: JSON.stringify({userGuid: ViewModel.userGuid, nickname: ViewModel.nickname}),
+      contentType: "application/json"
+    }
+  );
+}
+
+function sendCloseVote()
+{
+  console.log("Sending close vote");
+  $.ajax(URL + "/vote/close",
+    {
+      method: "POST",
+      async: true,
+      timeout: 10000,
+      data: JSON.stringify({userGuid: ViewModel.userGuid, nickname: ViewModel.nickname}),
       contentType: "application/json"
     }
   );

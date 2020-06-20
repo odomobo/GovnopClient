@@ -73,7 +73,6 @@ function poll()
       timeout: 60000
     }
   ).done(function( data ) {
-    // TODO: real stuff here
     console.log( data );
     
     for (var i = 0; i < data.length; i++)
