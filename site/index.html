@@ -24,44 +24,45 @@
     
     <link rel="stylesheet" href="style.css">
     
-    <script type="text/x-template" id="player-template">
-      <li v-bind:class="{ voted: voted }"><span class='nickname'>{{nickname}}</span> <span class='vote'>{{voteText}}</span></li>
-    </script>
   </head>
   <body>
     <div id="app">
       <h1 id="connection-error" class="hidden">Connection error to server...</h1>
       <h1>Govnopoly</h1>
+      
       <div id="players-pane">
         <label>Nickname: </label><input type="text" id="nickname"></input>        
-        <ul id="players">
+        <ul id="players" v-bind:class="{ 'show-votes': !voting.isOpen }">
           <!-- TODO: remove key maybe??? -->
           <!-- TODO: combine props into a single object?? -->
           <player 
             v-for="(player, guid) in players"
             v-bind:key="guid"
-            v-bind:nickname="player.nickname"
-            v-bind:vote="player.vote"
-            v-bind:vote-text="player.voteText"
-            v-bind:voted="player.voted"
+            v-bind:player="player"
           ></player>
         </ul>
       </div>
+      
       <div id="message-pane">
-        <ul id="messages"></ul>
+        <ul id="messages">
+          <message 
+            v-for="message in messages" 
+            v-bind:nickname="message.nickname"
+            v-bind:text="message.text"
+          ></message>
+        </ul>
         <input type="text" id="message" placeholder="Message"></input>
       </div>
-      <button id="roll-btn">Roll</button>
-      <div id="start-vote-pane">
-        <button id="start-vote-btn">Start Vote</button>
-        <button id="clear-vote-btn">Clear Vote</button>
+      
+      <div id="roll-pane">
+        <button id="roll-btn">Roll</button>
       </div>
-      <div id="vote-pane" class="disabled">
-        <button id="vote-yes-btn">Yes</button>
-        <button id="vote-no-btn">No</button>
-        <button id="vote-abstain-btn">Abstain</button>
-        <button id="close-vote-btn">Close Vote</button>
-      </div>
+      
+      <voting
+        :voting-buttons="voting.buttons"
+        v-bind:voting-open="voting.isOpen"
+        v-bind:selected-vote="voting.selected"
+      ></voting>
     </div>
   </body>
 </html>

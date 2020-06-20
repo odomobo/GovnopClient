@@ -1,6 +1,6 @@
 .hidden { display: none; }
 
-.disabled button {
+.disabled button, button.disabled {
   pointer-events: none;
   color: gray;
 }

@@ -1,6 +1,20 @@
 import ViewModel from './ViewModel.js';
 import URL from './URL.js';
 
+// TODO: build this in player module, register locally here
+export const MessageComponent = {
+  template: `
+    <li :class="{ player: nickname != null, system: nickname == null }">
+      <span v-if="nickname != null" class="username">{{ nickname }}:</span>
+      <span class="message">{{ text }}</span>
+    </li>
+  `,
+  props: {
+    nickname: String,
+    text: String
+  },
+};
+
 // TODO: refactor this to have its own endpoint, instead of being silly... I think?
 const TYPE_MESSAGE=0;
 export function send(message)
@@ -18,27 +32,14 @@ export function send(message)
   );
 }
 
-function appendRawMessage(html)
-{
-  var $messageList = $("#messages");
-  //$newMessage = $("<li class='"+cls+"'>"+html+"</li>");
-  $messageList.append(html);
-}
-
 function displayMessage(nickname, message)
 {
-  // TODO: don't preserve nickname, but do preserve message
-  var $html = $("<li class='player'><span class='username'></span> <span class='message'></span></li>");
-  $html.find(".username").text(nickname+":");
-  $html.find(".message").text(message);
-  appendRawMessage($html[0].outerHTML);
+  ViewModel.messages.push({nickname: nickname, text: message});
 }
 
 function displaySystemMessage(message)
 {
-  var $html = $("<li class='system'></li>");
-  $html.text("* " + message);
-  appendRawMessage($html[0].outerHTML);
+  ViewModel.messages.push({nickname: null, text: "* " + message});
 }
 
 export function display(nickname, message)

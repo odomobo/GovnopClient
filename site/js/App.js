@@ -62,45 +62,7 @@ const VOTE_NO='n';
 
 function initVoting() {
   $("#start-vote-btn").click(sendStartVote);
-  $("#clear-vote-btn").click(clearVote);
-  $("#vote-yes-btn").click(function(){sendVote(VOTE_YES)});
-  $("#vote-no-btn").click(function(){sendVote(VOTE_NO)});
-  $("#vote-abstain-btn").click(function(){sendVote(VOTE_ABSTAIN)});
   $("#close-vote-btn").click(sendCloseVote);
-}
-
-function clearVote() {
-  $("#players").removeClass("show-votes");
-  // TODO
-}
-
-function sendVote(voteId)
-{
-  console.log("Sending voting button click for: " + voteId);
-  $.ajax(URL + "/vote",
-    {
-      method: "POST",
-      async: true,
-      timeout: 10000,
-      data: JSON.stringify({userGuid: ViewModel.userGuid, nickname: ViewModel.nickname, voteId: voteId}),
-      contentType: "application/json"
-    }
-  );
-  
-  $("#vote-pane button").removeClass("vote-selected");
-  
-  if (voteId == VOTE_ABSTAIN)
-  {
-    $("#vote-abstain-btn").addClass("vote-selected");
-  }
-  else if (voteId == VOTE_YES)
-  {
-    $("#vote-yes-btn").addClass("vote-selected");
-  }
-  else if (voteId == VOTE_NO)
-  {
-    $("#vote-no-btn").addClass("vote-selected");
-  }
 }
 
 function sendStartVote()
