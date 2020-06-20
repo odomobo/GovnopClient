@@ -9,6 +9,6 @@ namespace GovopBackend.DTOs
     {
         public Guid UserGuid { get; set; }
         public string Nickname { get; set; }
-        public int VoteId { get; set; }
+        public string VoteId { get; set; }
     }
 }

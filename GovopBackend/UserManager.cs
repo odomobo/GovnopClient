@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace GovopBackend.DTOs
 {
@@ -11,6 +10,20 @@ namespace GovopBackend.DTOs
         Abstain = 0,
         Yes = 1,
         No = 2,
+    }
+
+    public static class Voting
+    {
+        public static Vote FromString(string v)
+        {
+            if (v == "a")
+                return Vote.Abstain;
+            if (v == "y")
+                return Vote.Yes;
+            if (v == "n")
+                return Vote.No;
+            throw new Exception("Could not convert vote"); // TODO: better exception?
+        }
     }
 
     public class UserManager
@@ -99,14 +112,14 @@ namespace GovopBackend.DTOs
             }
         }
 
-        public void CastVote(Guid userGuid, string nickname, int voteId)
+        public void CastVote(Guid userGuid, string nickname, string voteId)
         {
             lock (_users)
             {
                 if (_votingState != VotingState.Open)
                     return;
 
-                Vote vote = (Vote) voteId;
+                Vote vote = Voting.FromString(voteId);
                 if (!_users.ContainsKey(userGuid))
                 {
                     // after the ping, then it will contain the user guaranteed

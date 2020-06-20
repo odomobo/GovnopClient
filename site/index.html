@@ -1,31 +1,67 @@
 <html>
   <head>
     <title>Govnopoly</title>
+    
+    <!-- development version, includes helpful console warnings -->
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    
+    <!-- production version, optimized for size and speed -->
+    <!--<script src="https://cdn.jsdelivr.net/npm/vue"></script>-->
+    
+    <!-- TODO: use jquery as module?? -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="script.js"></script>
+    <!--<script type="module" src="./js/App.js"></script>-->
+    
+    <script type="module">
+      import './js/App.js';
+      
+      // TODO: App.start();
+      
+      // Export for easy debugging in console
+      import ViewModel from './js/ViewModel.js';
+      window.ViewModel = ViewModel;
+    </script>
+    
     <link rel="stylesheet" href="style.css">
+    
+    <script type="text/x-template" id="player-template">
+      <li v-bind:class="{ voted: voted }"><span class='nickname'>{{nickname}}</span> <span class='vote'>{{voteText}}</span></li>
+    </script>
   </head>
   <body>
-    <h1 id="connection-error" class="hidden">Connection error to server...</h1>
-    <h1>Govnopoly</h1>
-    <div id="players-pane">
-      <label>Nickname: </label><input type="text" id="nickname"></input>
-      <ul id="players"></ul>
-    </div>
-    <div id="message-pane">
-      <ul id="messages"></ul>
-      <input type="text" id="message" placeholder="Message"></input>
-    </div>
-    <button id="roll-btn">Roll</button>
-    <div id="start-vote-pane">
-      <button id="start-vote-btn">Start Vote</button>
-      <button id="clear-vote-btn">Clear Vote</button>
-    </div>
-    <div id="vote-pane" class="disabled">
-      <button id="vote-yes-btn">Yes</button>
-      <button id="vote-no-btn">No</button>
-      <button id="vote-abstain-btn">Abstain</button>
-      <button id="close-vote-btn">Close Vote</button>
+    <div id="app">
+      <h1 id="connection-error" class="hidden">Connection error to server...</h1>
+      <h1>Govnopoly</h1>
+      <div id="players-pane">
+        <label>Nickname: </label><input type="text" id="nickname"></input>        
+        <ul id="players">
+          <!-- TODO: remove key maybe??? -->
+          <!-- TODO: combine props into a single object?? -->
+          <player 
+            v-for="(player, guid) in players"
+            v-bind:key="guid"
+            v-bind:nickname="player.nickname"
+            v-bind:vote="player.vote"
+            v-bind:vote-text="player.voteText"
+            v-bind:voted="player.voted"
+          ></player>
+        </ul>
+      </div>
+      <div id="message-pane">
+        <ul id="messages"></ul>
+        <input type="text" id="message" placeholder="Message"></input>
+      </div>
+      <button id="roll-btn">Roll</button>
+      <div id="start-vote-pane">
+        <button id="start-vote-btn">Start Vote</button>
+        <button id="clear-vote-btn">Clear Vote</button>
+      </div>
+      <div id="vote-pane" class="disabled">
+        <button id="vote-yes-btn">Yes</button>
+        <button id="vote-no-btn">No</button>
+        <button id="vote-abstain-btn">Abstain</button>
+        <button id="close-vote-btn">Close Vote</button>
+      </div>
     </div>
   </body>
 </html>
